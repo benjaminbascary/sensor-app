@@ -67,8 +67,8 @@ function App(): JSX.Element {
     const manager = new BleManager();
 
     /**
-     * Replace first argument with the UUID of your device
-     * You will see your device in the console!
+     * Replace first null argument with an array of UUID's of your devices
+     * You will see your device in the console (I think)
      */
     manager.startDeviceScan(null, null, (error, device) => {
       console.log('Scanning...');
