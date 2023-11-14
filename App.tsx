@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -24,6 +24,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import {BleManager} from 'react-native-ble-plx';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -61,6 +62,19 @@ function App(): JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  useEffect(() => {
+    const manager = new BleManager();
+
+    /**
+     * Replace first argument with the UUID of your device
+     * You will see your device in the console!
+     */
+    manager.startDeviceScan(null, null, (error, device) => {
+      console.log('Scanning...');
+      console.log(device);
+    });
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
