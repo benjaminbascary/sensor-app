@@ -18,12 +18,13 @@ import {
 } from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {BleManager} from 'react-native-ble-plx';
+import {BleManager, Device} from 'react-native-ble-plx';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const [isScanning, setIsScanning] = useState<boolean>(false);
-  const [myDevice, setMyDevice] = useState<null | string>(null);
+  const [myDevice, setMyDevice] = useState<Device | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -40,12 +41,14 @@ function App(): JSX.Element {
         console.log(error);
         setIsScanning(false);
         return;
-      } else {
-        if (device?.id === UUID) {
-          setMyDevice(device!.id);
-          manager.stopDeviceScan();
-          setIsScanning(false);
-        }
+      }
+      if (device?.serviceUUIDs![0] === UUID) {
+        setMyDevice(device);
+        manager.stopDeviceScan();
+        manager.connectToDevice(device.id).then(() => {
+          setConnected(true);
+        });
+        setIsScanning(false);
       }
     });
   };
@@ -64,7 +67,20 @@ function App(): JSX.Element {
           <Text style={{alignSelf: 'center'}}>BLE App</Text>
           <Button onPress={onPressScanButton} title="Press to scan" />
           {myDevice && (
-            <Text style={{alignSelf: 'center'}}>My Device: {myDevice}</Text>
+            <View>
+              <Text style={{alignSelf: 'center'}}>
+                My Device: {myDevice.id}
+              </Text>
+              <Text style={{alignSelf: 'center'}}>
+                My Device: {myDevice.name}
+              </Text>
+              <Text>UUID: {myDevice.serviceUUIDs![0]}</Text>
+              {connected ? (
+                <Text>Connected!</Text>
+              ) : (
+                <Text>Not connected!</Text>
+              )}
+            </View>
           )}
         </View>
       </ScrollView>
