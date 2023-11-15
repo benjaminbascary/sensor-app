@@ -13,6 +13,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
@@ -33,6 +34,7 @@ function App(): JSX.Element {
   const manager = new BleManager();
 
   const UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+  const CHARACTERISTIC = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
 
   const onPressScanButton = () => {
     setIsScanning(true);
@@ -49,8 +51,19 @@ function App(): JSX.Element {
           setConnected(true);
         });
         setIsScanning(false);
+        // device.characteristicsForService(UUID).then(characteristics => {
+        //   console.log(characteristics);
+        // }).catch((error) => console.log(error))
       }
     });
+  };
+  
+  const onConnect = () => {
+    if (myDevice){
+      myDevice.characteristicsForService(UUID).then(characteristics => {
+        console.log(characteristics);
+      }).catch((error) => console.log(error))
+    }
   };
 
   return (
@@ -65,7 +78,12 @@ function App(): JSX.Element {
         {isScanning && <Text>Scanning</Text>}
         <View>
           <Text style={{alignSelf: 'center'}}>BLE App</Text>
-          <Button onPress={onPressScanButton} title="Press to scan" />
+          <TouchableOpacity style={{height: 100, backgroundColor: "blue"}} onPress={onPressScanButton}>
+            <Text style={{alignSelf: 'center', color: "white"}} >
+              Press to Scan
+              </Text>
+            </TouchableOpacity>
+          <Button onPress={onConnect} title="Conectar" />
           {myDevice && (
             <View>
               <Text style={{alignSelf: 'center'}}>
