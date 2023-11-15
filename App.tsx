@@ -5,8 +5,7 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useState} from 'react';
 import {
   Button,
   SafeAreaView,
@@ -18,17 +17,13 @@ import {
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BleManager} from 'react-native-ble-plx';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [isScanning, setIsScanning] = useState<boolean>(false);
+  const [myDevice, setMyDevice] = useState<null | string>(null);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -36,13 +31,21 @@ function App(): JSX.Element {
 
   const manager = new BleManager();
 
+  const UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+
   const onPressScanButton = () => {
+    setIsScanning(true);
     manager.startDeviceScan(null, null, (error, device) => {
       if (error) {
         console.log(error);
+        setIsScanning(false);
         return;
       } else {
-        console.log(device);
+        if (device?.id === UUID) {
+          setMyDevice(device!.id);
+          manager.stopDeviceScan();
+          setIsScanning(false);
+        }
       }
     });
   };
@@ -56,9 +59,13 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
+        {isScanning && <Text>Scanning</Text>}
         <View>
           <Text style={{alignSelf: 'center'}}>BLE App</Text>
           <Button onPress={onPressScanButton} title="Press to scan" />
+          {myDevice && (
+            <Text style={{alignSelf: 'center'}}>My Device: {myDevice}</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
