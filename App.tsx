@@ -5,9 +5,11 @@
  * @format
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Button,
+  PermissionsAndroid,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -19,6 +21,7 @@ import {
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BleManager, Device} from 'react-native-ble-plx';
+import requestBluetoothPermission from './utils/permissions';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -29,7 +32,12 @@ function App(): JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-
+  const handlePermissions = async () => {
+    await requestBluetoothPermission();
+  };
+  useEffect(() => {
+    handlePermissions();
+  }, []);
   const manager = new BleManager();
 
   const UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
